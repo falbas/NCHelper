@@ -10,16 +10,19 @@ from matplotlib.colors import ListedColormap
 
 class NCHelper:
     def __init__(self, dataset, dir_path):
+        # read the dataset
+        print("reading dataset...")
+        try:
+            self.ds = xr.open_dataset(dataset)
+        except:
+            raise Exception("reading dataset failed")
+        print("reading dataset done")
+        
         # create new directory
+        self.dir_path = dir_path
         if os.path.exists(dir_path):
             shutil.rmtree(dir_path)
         os.mkdir(dir_path)
-
-        # read the dataset
-        print("reading dataset...")
-        self.ds = xr.open_dataset(dataset)
-        self.dir_path = dir_path
-        print("reading dataset done")
 
     def nc2asc(self, var, lat, lon, asc_name):
         # prepare the variables

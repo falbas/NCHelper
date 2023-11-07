@@ -9,7 +9,6 @@ u = nch.ds["u"]
 v = nch.ds["v"]
 lat = nch.ds["lat"]
 lon = nch.ds["lon"]
-
 nch.nc2asc(u[0][0], lat, lon, "U")
 nch.nc2asc(v[0][0], lat, lon, "V")
 
