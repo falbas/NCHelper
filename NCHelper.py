@@ -16,8 +16,10 @@ class NCHelper:
         os.mkdir(dir_path)
 
         # read the dataset
+        print("reading dataset...")
         self.ds = xr.open_dataset(dataset)
         self.dir_path = dir_path
+        print("reading dataset done")
 
     def nc2asc(self, var, lat, lon, asc_name):
         # prepare the variables
@@ -30,6 +32,7 @@ class NCHelper:
         grid = var.values
 
         # generate ascii grid file
+        print(f"generating {asc_name} ascii grid...")
         with open(f"{self.dir_path}/{asc_name}.asc", "w") as file:
             file.write(f"ncols {ncols}\n")
             file.write(f"nrows {nrows}\n")
@@ -41,9 +44,11 @@ class NCHelper:
                 for j in i:
                     file.write(f"{j} ")
                 file.write("\n")
+        print(f"file: {os.getcwd()}/{self.dir_path}/{asc_name}.asc".replace("\\", "/"))
 
     def nc2image(self, var, img_name, x_dim, y_dim, cmap="turbo", flip=None):
         # generate gray geotiff image
+        print(f"generating {img_name} the images...")
         img_dir = f"{self.dir_path}/{img_name}"
         _var = var.rio.set_spatial_dims(x_dim=x_dim, y_dim=y_dim)
         _var.rio.crs
@@ -64,8 +69,11 @@ class NCHelper:
                 lines = file.readlines()
                 for line in lines:
                     values = line.split()
-                    r, g, b = int(values[1]), int(values[2]), int(values[3])
-                    custom_colors.append((r, g, b))
+                    if (len(values) == 4):
+                        r, g, b = int(values[1]), int(values[2]), int(values[3])
+                        custom_colors.append((r, g, b))
+                    else:
+                        raise Exception(f"the {cmap} does not match the template")
 
             custom_colors_normalized = [
                 (r / 255, g / 255, b / 255) for r, g, b in custom_colors
@@ -127,6 +135,11 @@ class NCHelper:
             crs=var_tiff_raster.crs,
         ) as dst:
             dst.write(data, indexes=bands)
+
+        print(f"output: {os.getcwd()}/{img_dir}.tiff".replace("\\", "/"))
+        print(f"output: {os.getcwd()}/{img_dir}.png".replace("\\", "/"))
+        print(f"output: {os.getcwd()}/{img_dir}_colorbar.png".replace("\\", "/"))
+        print(f"output: {os.getcwd()}/{img_dir}_rgb.tiff".replace("\\", "/"))
 
         # close the openned file
         var_tiff_raster.close()
