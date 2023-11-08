@@ -9,16 +9,14 @@ import sys
 #     f"http://182.16.248.173:8080/dods/INA-NWP/{date_str}/{date_str}-d01-asim"
 # )
 
-date = datetime.now().replace(hour=12)
+# date = datetime.strptime("2023110900", "%Y%m%d%H")
+date = datetime.now().replace(hour=0)
 nch = None
 dir_path = ""
-limit = 0
-while limit <= 100:
+limit = 1
+while limit <= 2:
     date_str = date.strftime("%Y%m%d%H")
     dir_path = f"storage/{date_str}"
-    if os.path.exists(dir_path):
-        print("already exists")
-        sys.exit(0)
 
     try:
         nch = NCHelper(
