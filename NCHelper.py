@@ -21,12 +21,12 @@ class NCHelper:
             print("reading dataset failed")
             raise Exception("reading dataset failed")
 
-    def nc2asc(self, var, lat, lon, output_name):
+    def nc2asc(self, var, lat, lon, output_name, flip=None):
         # prepare the variables
         ncols = len(lon.values)
         nrows = len(lat.values)
-        xllcorner = lon[0].values
-        yllcorner = lat[-1].values
+        xllcorner = lon[-1].values if flip == 1 else lon[0].values
+        yllcorner = lat[0].values if flip == 0 else lat[-1].values
         cellsize = abs(lat[0].values - lat[1].values)
         NODATA_value = -9999
         grid = var.values
