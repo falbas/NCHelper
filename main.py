@@ -1,16 +1,24 @@
 from NCHelper import NCHelper
+from datetime import datetime, timedelta
+import time
+import os
 
-nch = NCHelper(
-    "http://182.16.248.173:8080/dods/INA-NWP/2023102800/2023102800-d01-asim",
-    dir_path="storage/tes",
-)
+date = datetime.now().replace(hour=00)
+ds = None
+while True:
+    date_str = date.strftime("%Y%m%d%H")
+    dir_path = f"storage/{date_str}"
+    if os.path.exists(dir_path):
+        print("already exists")
+        break
 
-u = nch.ds["u"]
-v = nch.ds["v"]
-lat = nch.ds["lat"]
-lon = nch.ds["lon"]
-nch.nc2asc(u[0][0], lat, lon, "U")
-nch.nc2asc(v[0][0], lat, lon, "V")
-
-tc = nch.ds["tc"]
-nch.nc2image(tc[0][0], "tc", x_dim="lon", y_dim="lat", flip=0, cmap="tc_color.txt")
+    try:
+        nch = NCHelper(
+            f"http://182.16.248.173:8080/dods/INA-NWP/{date_str}/{date_str}-d01-asim",
+            dir_path=dir_path,
+        )
+        break
+    except:
+        date = date - timedelta(hours=12)
+        
+    time.sleep(1)
