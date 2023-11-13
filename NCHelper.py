@@ -29,12 +29,14 @@ class NCHelper:
         if lat[0] < lat[-1]: # vertical
             lat = np.flip(lat, axis=0)
             var = np.flip(var, axis=0)
+        avlat = abs(lat[0]-lat[-1])/len(lat)
+        avlon = abs(lon[0]-lon[-1])/len(lon)
 
         ncols = len(lon)
         nrows = len(lat)
         xllcorner = lon[0]
         yllcorner = lat[-1]
-        cellsize = abs(lat[0] - lat[1])
+        cellsize = (avlat+avlon)/2
         NODATA_value = -9999
         grid = var
 
