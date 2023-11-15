@@ -52,16 +52,7 @@ class NCHelper:
                 file.write("\n")
         print(f"output: {os.getcwd()}/{output_file}".replace("\\", "/"))
 
-    def nc2tif(self, var, output_name, x_dim, y_dim):
-        # generate gray geotiff image
-        print(f"generating {output_name} geotiff images...")
-        img_dir = f"{output_name}"
-        _var = var.rio.set_spatial_dims(x_dim=x_dim, y_dim=y_dim)
-        _var.rio.crs
-        _var.rio.write_crs("epsg:4326", inplace=True)
-        _var.rio.to_raster(f"{img_dir}.tif")
-
-    def nc2tif2(self, var, output_name, lat, lon, nodata=9999):
+    def nc2tif(self, var, output_name, lat, lon, nodata=-9999):
         # generate gray geotif image
         var = np.flip(var, axis=0)
         transform = rasterio.transform.from_bounds(west=lon[0],south=lat[0],east=lon[-1],north=lat[-1],width=lon.shape[0],height=lat.shape[0])
@@ -79,7 +70,7 @@ class NCHelper:
         ) as dst:
             dst.write(var, 1)
 
-    def nc2rgbtif(self, output_name, color_table):
+    def gtif2rgbtif(self, output_name, color_table):
         img_dir = f"{output_name}"
         # generate rgb geotif image
         # https://gdal.org/programs/gdaldem.html
