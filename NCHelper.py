@@ -99,6 +99,6 @@ class NCHelper:
                 f"{output_dir}",
                 f"--zoom={zoom}",
                 f"--processes={processes}",
-                "--webviewer=leaflet",
+                "--webviewer=none",
             ]
         )
