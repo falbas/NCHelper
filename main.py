@@ -19,16 +19,14 @@ for initial_time in initial_times:
         times.append(dt.strftime("%Y%m%d%H"))
 
     level = nch.ds["lev"]
-    # levels = [0, 3, 6, 10, 16]
-    levels = [0, 3, 6]
+    levels = [0, 3, 6, 10, 16]
+    # levels = [0, 3, 6]
 
     lat = nch.ds["lat"]
     lon = nch.ds["lon"]
-    u = nch.ds["u"]
-    v = nch.ds["v"]
 
     vars = ["u", "v", "tc", "rh", "wspd"]
-    # vars = ["tc"]
+    # vars = ["landmask"]
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     output_dir = f"storage/{initial_time}"
@@ -46,18 +44,22 @@ for initial_time in initial_times:
             for var in vars:
                 var_dir = f"{dir_path}/{var}"
                 os.mkdir(var_dir)
-                nch.nc2tif(nch.ds[var][i][j].values, f"{var_dir}/{var}", lat.values, lon.values)
+                nch.nc2tif(nch.ds[var][i][j].values, f"{var_dir}/{var}.tif", lat.values, lon.values)
 
                 if var not in ["u", "v"]:
-                    nch.gtif2rgbtif(f"{var_dir}/{var}", f"{current_dir}/color/{var}_color.txt")
-                    nch.geotif2tiles(
-                        "C:/Users/falbas/miniconda3/Scripts/gdal2tiles.py",
-                        f"{var_dir}/{var}_rgb.tif",
-                        f"{var_dir}",
-                        "5-8",
-                        16,
-                    )
+                    nch.gtif2rgbtif(f"{var_dir}/{var}.tif", f"{var_dir}/{var}_rgb.tif", f"{current_dir}/color/{var}_color.txt")
+                    nch.tif2img(f"{var_dir}/{var}_rgb.tif", f"{var_dir}/{var}.jpg", format="JPEG")
+                    os.remove(f"{var_dir}/{var}.tif")
+                    os.remove(f"{var_dir}/{var}_rgb.tif")
+                    os.remove(f"{var_dir}/{var}.jpg.aux.xml")
+                    # nch.geotif2tiles(
+                    #     "C:/Users/falbas/miniconda3/Scripts/gdal2tiles.py",
+                    #     f"{var_dir}/{var}_rgb.tif",
+                    #     f"{var_dir}",
+                    #     "5-8",
+                    #     16,
+                    # )
 
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed Time: {elapsed_time} seconds")
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    print(f"Elapsed Time: {elapsed_time} seconds")
