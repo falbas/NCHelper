@@ -4,8 +4,8 @@ import shutil
 import time
 
 start_time = time.time()
-initial_times = ["2023111412", "2023110800", "2023110700"]
-# initial_times = ["2023111412"]
+# initial_times = ["2023111412", "2023110800", "2023110700"]
+initial_times = ["2023111412"]
 
 for initial_time in initial_times:
     nch = NCHelper(
@@ -26,12 +26,11 @@ for initial_time in initial_times:
     lon = nch.ds["lon"]
 
     # vars = ["u", "v", "tc", "rh", "wspd", "tp"]
-    vars = ["tp"]
+    vars = ["tc"]
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
     output_dir = f"storage/{initial_time}"
     os.mkdir(output_dir)
-    for i in range(0, len(times)):
+    for i in range(0, len(times)-24):
         dir_path = f"{output_dir}/{times[i]}"
         if os.path.exists(dir_path):
             shutil.rmtree(dir_path)
@@ -49,15 +48,24 @@ for initial_time in initial_times:
                     rainsh = nch.ds["rainsh"][i][j]
                     rainnc = nch.ds["rainnc"][i][j]
                     tp = rainc + rainsh + rainnc
-                    nch.nc2tif(tp.values, f"{var_dir}/{var}.tif", lat.values, lon.values)
+                    nch.nc2tif(
+                        tp.values, f"{var_dir}/{var}.tif", lat.values, lon.values
+                    )
                 else:
-                    nch.nc2tif(nch.ds[var][i][j].values, f"{var_dir}/{var}.tif", lat.values, lon.values)
+                    nch.nc2tif(
+                        nch.ds[var][i][j].values,
+                        f"{var_dir}/{var}.tif",
+                        lat.values,
+                        lon.values,
+                    )
 
                 if var not in ["u", "v"]:
-                    nch.gtif2rgbtif(f"{var_dir}/{var}.tif", f"{var_dir}/{var}_rgb.tif", f"{current_dir}/color/{var}_color.txt")
-                    nch.tif2img(f"{var_dir}/{var}_rgb.tif", f"{var_dir}/{var}.jpg", format="JPEG")
-                    os.remove(f"{var_dir}/{var}.tif")
-                    os.remove(f"{var_dir}/{var}_rgb.tif")
+                    nch.tif2jpg(
+                        f"{var_dir}/{var}.tif",
+                        f"{var_dir}/{var}.jpg",
+                        f"color/{var}_color.txt",
+                        format="JPEG",
+                    )
                     os.remove(f"{var_dir}/{var}.jpg.aux.xml")
                     # nch.geotif2tiles(
                     #     "C:/Users/falbas/miniconda3/Scripts/gdal2tiles.py",
@@ -67,6 +75,6 @@ for initial_time in initial_times:
                     #     16,
                     # )
 
-                    end_time = time.time()
-                    elapsed_time = end_time - start_time
-                    print(f"Elapsed Time: {elapsed_time} seconds")
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                print(f"Elapsed Time: {elapsed_time} seconds")

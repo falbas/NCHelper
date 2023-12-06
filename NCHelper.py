@@ -38,7 +38,7 @@ class NCHelper:
         grid = var
 
         # generate ascii grid file
-        print(f"generating {output}...")
+        print(f"generating: {os.getcwd()}/{output}".replace("\\", "/"))
         with open(output, "w") as file:
             file.write(f"ncols {ncols}\n")
             file.write(f"nrows {nrows}\n")
@@ -63,6 +63,7 @@ class NCHelper:
             width=lon.shape[0],
             height=lat.shape[0],
         )
+        print(f"generating: {os.getcwd()}/{output}".replace("\\", "/"))
         with rasterio.open(
             output,
             "w",
@@ -76,22 +77,25 @@ class NCHelper:
             nodata=nodata,
         ) as dst:
             dst.write(var, 1)
+        print(f"output: {os.getcwd()}/{output}".replace("\\", "/"))
 
-    def gtif2rgbtif(self, input, output, color_table):
+    def tif2rgbtif(self, input, output, color_table):
         # https://gdal.org/programs/gdaldem.html
-        print(f"generating {output}")
+        print(f"generating: {os.getcwd()}/{output}".replace("\\", "/"))
         subprocess.run(["gdaldem", "color-relief", input, color_table, output])
         print(f"output: {os.getcwd()}/{output}".replace("\\", "/"))
 
-    def tif2img(self, input, output, format="JPEG"):
-        # https://gdal.org/programs/gdal_translate.html
-        print(f"generating {output}")
+    def tif2jpg(self, input, output, color_table="", format="JPEG"):
+        # https://gdal.org/programs/gdaldem.html
+        print(f"generating: {os.getcwd()}/{output}".replace("\\", "/"))
         subprocess.run(
             [
-                "gdal_translate",
+                "gdaldem",
+                "color-relief",
                 "-of",
                 f"{format}",
                 input,
+                color_table,
                 output,
             ]
         )
@@ -99,6 +103,7 @@ class NCHelper:
 
     def geotif2tiles(self, gdal2tiles_path, input, output_dir, zoom="5-7", processes=1):
         # https://gdal.org/programs/gdal2tiles.html
+        print(f"generating: {os.getcwd()}/{output_dir}".replace("\\", "/"))
         subprocess.run(
             [
                 "python",
@@ -110,3 +115,4 @@ class NCHelper:
                 "--webviewer=none",
             ]
         )
+        print(f"output: {os.getcwd()}/{output_dir}".replace("\\", "/"))
