@@ -5,7 +5,7 @@ import time
 
 start_time = time.time()
 initial_times = ["2023111412", "2023110800", "2023110700"]
-# initial_times = ["2023110800"]
+# initial_times = ["2023111412"]
 
 for initial_time in initial_times:
     nch = NCHelper(
@@ -20,13 +20,13 @@ for initial_time in initial_times:
 
     level = nch.ds["lev"]
     levels = [0, 3, 6, 10, 16]
-    # levels = [0, 3, 6]
+    # levels = [0]
 
     lat = nch.ds["lat"]
     lon = nch.ds["lon"]
 
-    vars = ["u", "v", "tc", "rh", "wspd"]
-    # vars = ["landmask"]
+    # vars = ["u", "v", "tc", "rh", "wspd", "tp"]
+    vars = ["tp"]
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     output_dir = f"storage/{initial_time}"
@@ -44,7 +44,14 @@ for initial_time in initial_times:
             for var in vars:
                 var_dir = f"{dir_path}/{var}"
                 os.mkdir(var_dir)
-                nch.nc2tif(nch.ds[var][i][j].values, f"{var_dir}/{var}.tif", lat.values, lon.values)
+                if var == "tp":
+                    rainc = nch.ds["rainc"][i][j]
+                    rainsh = nch.ds["rainsh"][i][j]
+                    rainnc = nch.ds["rainnc"][i][j]
+                    tp = rainc + rainsh + rainnc
+                    nch.nc2tif(tp.values, f"{var_dir}/{var}.tif", lat.values, lon.values)
+                else:
+                    nch.nc2tif(nch.ds[var][i][j].values, f"{var_dir}/{var}.tif", lat.values, lon.values)
 
                 if var not in ["u", "v"]:
                     nch.gtif2rgbtif(f"{var_dir}/{var}.tif", f"{var_dir}/{var}_rgb.tif", f"{current_dir}/color/{var}_color.txt")
